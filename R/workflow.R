@@ -9,7 +9,8 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
                                    ,remove_outliers = FALSE
                                    ,final_cluster_count = 500
                                    ,kmeans_upsampling_iterations = 1
-                                   ,plot_trees = TRUE) { #TODO: add BirchTree parameters so they can be set
+                                   ,plot_trees = TRUE
+                                   ,subcluster_limit = NULL) { #TODO: add BirchTree parameters so they can be set
 
   # load packages
   suppressWarnings(library(flowCore))
@@ -22,7 +23,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   # set input file names, output directory ...
   input_file_name = basename(input_file_full)
   outputs_dir <- paste0(outputs_dir,"/",input_file_name)
-  suppressWarnings(dir.create(outputs_dir)) #cretae directory if not existing
+  dir.create(outputs_dir) #cretae directory if not existing
 
   # set needed variables
   comp = TRUE
@@ -37,13 +38,15 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   ## 2 # use BirchTree to reduce data (as downsampling in SPADE)
   BF_B = 10
   BF_L = 15
-  subclust_lim = round(nrow(cells_data)/10)
+  if (is.null(subcluster_limit)) {
+    subcluster_limit = round(nrow(cells_data)/10)
+  }
   # remove_outliers = F
 
   message("BirchTree data reduction ... ")
   BirchTree_start_time <- Sys.time()
   birch_out = BirchTree::buildTree(cells_data, BF_B, BF_L, 0, cluster_size_metric = "radius",
-                                   subcluster_limit = subclust_lim, rebuild_size_factor = 2,
+                                   subcluster_limit = subcluster_limit, rebuild_size_factor = 2,
                                    remove_outliers = remove_outliers)
   subclusters = as.data.frame(birch_out$subclusters)[,1:markers_cout]
   colnames(subclusters) = markers
