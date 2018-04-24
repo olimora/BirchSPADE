@@ -32,5 +32,6 @@ BirchSPADE.save_original_data_with_clusters <- function(input_file_full
   input_file <- basename(input_file_full)
   data_with_clusters_file = paste0(outputs_dir,"/",input_file,".cluster.fcs")
   suppressWarnings(write.FCS(out_frame, data_with_clusters_file))
+  print(data_with_clusters_file)
   return(list("fcs_params" = parameters(in_fcs)@data, "file" = data_with_clusters_file))
 }
