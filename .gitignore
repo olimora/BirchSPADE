@@ -1,5 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
+.Rproj
+BirchSPADE.Rproj
 
 **/data/**
