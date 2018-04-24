@@ -10,7 +10,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
                                    ,final_cluster_count = 500
                                    ,kmeans_upsampling_iterations = 1
                                    ,plot_trees = TRUE
-                                   ,subcluster_limit = NULL) { #TODO: add BirchTree parameters so they can be set
+                                   ,subcluster_limit = 0) { #TODO: add BirchTree parameters so they can be set
 
   # load packages
   suppressWarnings(library(flowCore))
@@ -38,7 +38,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   ## 2 # use BirchTree to reduce data (as downsampling in SPADE)
   BF_B = 10
   BF_L = 15
-  if (is.null(subcluster_limit)) {
+  if (is.null(subcluster_limit) || subcluster_limit < 1) {
     subcluster_limit = round(nrow(cells_data)/10)
   }
   # remove_outliers = F
