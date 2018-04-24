@@ -23,7 +23,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   # set input file names, output directory ...
   input_file_name = basename(input_file_full)
   outputs_dir <- paste0(outputs_dir,"/",input_file_name)
-  dir.create(outputs_dir) #cretae directory if not existing
+  dir.create(outputs_dir, showWarnings = FALSE) #cretae directory if not existing
 
   # set needed variables
   comp = TRUE
@@ -41,7 +41,6 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   if (is.null(subcluster_limit) || subcluster_limit < 1) {
     subcluster_limit = round(nrow(cells_data)/10)
   }
-  # remove_outliers = F
 
   message("BirchTree data reduction ... ")
   BirchTree_start_time <- Sys.time()
