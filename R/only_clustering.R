@@ -118,4 +118,5 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   message(paste0("Whole analysis took time (seconds): ",
                  round(difftime(whole_analysis_end_time, whole_analysis_start_time, units='secs'), digits = 2)))
 
+  return (as.data.frame(cells_data))
 }
