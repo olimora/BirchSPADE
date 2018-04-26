@@ -44,9 +44,8 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   subclusters = as.data.frame(birch_out$subclusters)[,1:markers_cout]
   colnames(subclusters) = markers
   if (use_density) {
-    c1 = markers_cout+1
-    c2 = markers_cout+2
-    subclusters$density = birch_out$subclusters[,c1] / birch_out$subclusters[,c2]
+    dens_c = ncol(birch_out$subclusters)
+    subclusters$density = birch_out$subclusters[,dens_c]
   }
   BirchTree_end_time <- Sys.time()
   message(paste0("BirchTree data reduction took time (seconds): ",
@@ -61,9 +60,8 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
     outliers = as.data.frame(birch_out$outliers)[,1:markers_cout]
     colnames(outliers) = markers
     if (use_density) {
-      c1 = markers_cout+1
-      c2 = markers_cout+2
-      outliers$density = birch_out$outliers[,c1] / birch_out$outliers[,c2]
+      dens_c = ncol(birch_out$outliers)
+      outliers$density = birch_out$outliers[,dens_c]
     }
     removal.result = BirchSPADE.remove_outliers(cells_data, outliers)
     cells_data = removal.result$data
