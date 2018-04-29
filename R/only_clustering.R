@@ -22,7 +22,6 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   comp = TRUE
   transforms = flowCore::arcsinhTransform(a=0, b=0.2)
   markers_cout = length(markers)
-  cluster_colls_count = markers_cout
 
   ## 1 # read input fcs file, load data, use arcsinh transform
   message("Loading fcs data, transforming, normalizing ... ")
@@ -78,9 +77,10 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
     } else if (normalization == "minmax") {
       # print("Minmax normalization.")
       library(caret)
-      pp = preProcess(subclusters$density, method = "range")
-      subclusters$density = predict(pp, subclusters$density)
-      rm(pp)
+      pp = preProcess(as.data.frame(subclusters$density), method = "range")
+      density_col = unname(as.vector(predict(pp, as.data.frame(subclusters$density))))
+      subclusters = cbind(subclusters[,1:markers_cout], density = density_col)
+      rm(pp, density_col)
     } else if (normalization == "meanstd") {
       # print("Meanstd normalization.")
       subclusters$density = scale(subclusters$density)
@@ -106,7 +106,8 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   hier_cluster_centroids <- aggregate(subclusters, by=list(subclusters$hier_cluster),FUN=mean)[,-1] # first column is the group
   # suppress warning that it did not konverge
   suppressWarnings(kmeans.result <- kmeans(x = cells_data,
-                                           centers = hier_cluster_centroids[,1:markers_cout], iter.max = kmeans_upsampling_iterations))
+                                           centers = hier_cluster_centroids[,1:markers_cout],
+                                           iter.max = kmeans_upsampling_iterations))
   cells_data <- cbind(cells_data, "cluster" = kmeans.result$cluster)
   # every cell has assigned final cluster
   upsampling_end_time <- Sys.time()
