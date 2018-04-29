@@ -1,6 +1,6 @@
 BirchSPADE.remove_outliers <- function(cells_data, outliers) {
   cells_hash = vector(mode = "numeric", length = nrow(cells_data))
-  cells_hash = vector(mode = "numeric", length = nrow(outliers))
+  outliers_hash = vector(mode = "numeric", length = nrow(outliers))
   for (i in 1:nrow(cells_data)) {
     cells_hash[i] = 0
     for (j in 1:ncol(cells_data)) {

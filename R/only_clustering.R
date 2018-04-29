@@ -22,7 +22,6 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   comp = TRUE
   transforms = flowCore::arcsinhTransform(a=0, b=0.2)
   markers_cout = length(markers)
-  cluster_colls_count = markers_cout
 
   ## 1 # read input fcs file, load data, use arcsinh transform
   message("Loading fcs data, transforming, normalizing ... ")
@@ -78,9 +77,10 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
     } else if (normalization == "minmax") {
       # print("Minmax normalization.")
       library(caret)
-      pp = preProcess(subclusters$density, method = "range")
-      subclusters$density = predict(pp, subclusters$density)
-      rm(pp)
+      pp = preProcess(as.data.frame(subclusters$density), method = "range")
+      density_col = unname(as.vector(predict(pp, as.data.frame(subclusters$density))))
+      subclusters = cbind(subclusters[,1:markers_cout], density = density_col)
+      rm(pp, density_col)
     } else if (normalization == "meanstd") {
       # print("Meanstd normalization.")
       subclusters$density = scale(subclusters$density)
@@ -93,21 +93,25 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   # methods <- c("ward", "average", "single", "complete")
   hclust.result <- Rclusterpp.hclust(subclusters, method = "ward", distance = "euclidean")
   subclusters$hier_cluster = cutree(hclust.result, k = final_cluster_count)
+  # get hier_clusters centroids
+  hier_cluster_centroids <- aggregate(subclusters, by=list(subclusters$hier_cluster),FUN=mean)[,-1] # first column is the group
   hclust_end_time <- Sys.time()
   message(paste0("Hierarchical clustering took time (seconds): ",
                  round(difftime(hclust_end_time, hclust_start_time, units='secs'), digits = 2)))
 
 
   ## 4 # upsampling using K-means
-  # need to find for every point from cells_data closest sub_cluster from birch/ hier_cluster from hclust with k-means, 1 iteration
+  # need to find for every point from cells_data closest sub_cluster from birch with k-means, 1 iteration
   message("Upsampling fcs to clusters using k-means ... ")
   upsampling_start_time <- Sys.time()
-  # get hier_clusters centroids
-  hier_cluster_centroids <- aggregate(subclusters, by=list(subclusters$hier_cluster),FUN=mean)[,-1] # first column is the group
   # suppress warning that it did not konverge
   suppressWarnings(kmeans.result <- kmeans(x = cells_data,
-                                           centers = hier_cluster_centroids[,1:markers_cout], iter.max = kmeans_upsampling_iterations))
-  cells_data <- cbind(cells_data, "cluster" = kmeans.result$cluster)
+                                           centers = subclusters[,1:markers_cout],
+                                           iter.max = kmeans_upsampling_iterations,
+                                           algorithm = "Lloyd"))
+  #assign clusters to cells by subcluster assigment to hier clusters
+  cluster_col = subclusters$hier_cluster[kmeans.result$cluster]
+  cells_data = cbind(cells_data, "cluster" = cluster_col)
   # every cell has assigned final cluster
   upsampling_end_time <- Sys.time()
   message(paste0("Upsampling took time (seconds): ",
