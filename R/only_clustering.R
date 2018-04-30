@@ -5,7 +5,8 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
                                     ,final_cluster_count = 500
                                     ,kmeans_upsampling_iterations = 1
                                     ,subcluster_limit = 0
-                                    ,use_density = FALSE) { #TODO: add BirchTree parameters so they can be set
+                                    ,use_density = FALSE
+                                    ,hclust_method = "ward") { #TODO: add BirchTree parameters so they can be set
 
   # load packages
   suppressWarnings(library(flowCore))
@@ -91,7 +92,7 @@ BirchSPADE.clustering.only <- function(input_file_full             # full path t
   message("Hierarchical clustering of subclusters ... ")
   hclust_start_time <- Sys.time()
   # methods <- c("ward", "average", "single", "complete")
-  hclust.result <- Rclusterpp.hclust(subclusters, method = "ward", distance = "euclidean")
+  hclust.result <- Rclusterpp.hclust(subclusters, method = hclust_method, distance = "euclidean")
   subclusters$hier_cluster = cutree(hclust.result, k = final_cluster_count)
   # get hier_clusters centroids
   hier_cluster_centroids <- aggregate(subclusters, by=list(subclusters$hier_cluster),FUN=mean)[,-1] # first column is the group
