@@ -1,4 +1,4 @@
-## This file hase similar function as driver.R in SPADE.
+## This file has similar function as driver.R in SPADE.
 ## Here is declared function that should be called to use this package for SPADE analysis
 
 
