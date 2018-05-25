@@ -67,7 +67,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
     remove_outliers_start_time <- Sys.time()
     outliers = as.data.frame(birch_out$outliers)[,1:markers_cout]
     colnames(outliers) = markers
-	if (use_density) {
+	  if (use_density) {
       dens_c = ncol(birch_out$outliers)
       outliers$density = birch_out$outliers[,dens_c]
     }
@@ -104,6 +104,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   subclusters$hier_cluster = cutree(hclust.result, k = final_cluster_count)
   # get hier_clusters centroids
   hier_cluster_centroids <- aggregate(subclusters, by=list(subclusters$hier_cluster),FUN=mean)[,-1] # first column is the group
+  hier_cluster_centroids <- hier_cluster_centroids[,1:markers_cout]
   hclust_end_time <- Sys.time()
   message(paste0("Hierarchical clustering took time (seconds): ",
                round(difftime(hclust_end_time, hclust_start_time, units='secs'), digits = 2)))
@@ -114,6 +115,8 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   message("Upsampling fcs to clusters using k-means ... ")
   upsampling_start_time <- Sys.time()
 
+  # unite subclusters with the same centroid (thay have to be already in the same hier clust)
+  subclusters = unique(subclusters)
   # suppress warning that it did not konverge
   suppressWarnings(kmeans.result <- kmeans(x = cells_data,
                                            centers = subclusters[,1:markers_cout],
@@ -143,7 +146,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   message("Computing visualisations = graph, layout, medians and others ... ")
   compute_visualisation_start_time <- Sys.time()
   visualisation = BirchSPADE.compute_visualisation(outputs_dir, hclust.result$merge,
-                                  hier_cluster_centroids[1:markers_cout], input_file_full,
+                                  hier_cluster_centroids, input_file_full,
                                   saving.returns$file, transforms, markers, comp)
   compute_visualisation_end_time <- Sys.time()
   message(paste0("Computing visualisations took time (seconds): ",
