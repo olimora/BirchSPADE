@@ -266,8 +266,8 @@ SPADElike_plotTrees <- function(graph, files, params, file_pattern="*anno.Rsave"
         protein_name <- gsub(pattern = "^medians|raw_medians|cvs|raw_fold|fold", replacement = "", x = name)
         marker <- params$desc[params$name == protein_name]
         marker <- gsub(pattern = " ", replacement = "", x = marker)
+        marker = gsub(pattern = " |/|:|\\?|<|>|\"|\\*|\\||\\\\", replacement = "", x = marker)
         name = gsub(x = name, pattern = protein_name, replacement = paste0(".",marker))
-        name = gsub(pattern = " |/|:|\\?|<|>|\"|\\*|\\||\\\\", replacement = "", x = name)
         protein_name = paste0(".", protein_name)
       }
       # Plot the tree, with legend showing the gradient
