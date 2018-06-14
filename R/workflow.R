@@ -47,7 +47,7 @@ BirchSPADE.run.analysis <- function(input_file_full             # full path to t
   message("BirchTree data reduction ... ")
   BirchTree_start_time <- Sys.time()
   birch_out = BirchTree::buildTree(cells_data, BF_B, BF_L, 0, cluster_size_metric = "radius",
-                                   subcluster_limit = subcluster_limit, rebuild_size_factor = 2,
+                                   subcluster_limit = subcluster_limit, rebuild_size_factor = 3,
                                    remove_outliers = remove_outliers)
   subclusters = as.data.frame(birch_out$subclusters)[,1:markers_cout]
   colnames(subclusters) = markers
